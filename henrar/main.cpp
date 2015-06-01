@@ -17,6 +17,8 @@ void updateLaplace (float *u, float *u_prev, int N, float h, float dt, float alp
 		return;
 	}	
 
+	u_prev[I] = u[I];
+
 	if ( (I > N) && (I < N*N - 1 - N) && (I % N != 0) && (I % N != N - 1)) 
 	{	
 		u[I] = u_prev[I] + alpha*dt/(h*h) * (u_prev[I+1] + u_prev[I-1] + u_prev[I+N] + u_prev[I-N] - 4*u_prev[I]);

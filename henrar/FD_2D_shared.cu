@@ -7,29 +7,30 @@
 
 void checkErrors(char *label)
 {
-// we need to synchronise first to catch errors due to
-// asynchroneous operations that would otherwise
-// potentially go unnoticed
-cudaError_t err;
-err = cudaThreadSynchronize();
-if (err != cudaSuccess)
-{
-char *e = (char*) cudaGetErrorString(err);
-fprintf(stderr, "CUDA Error: %s (at %s)\n", e, label);
-}
-err = cudaGetLastError();
-if (err != cudaSuccess)
-{
-char *e = (char*) cudaGetErrorString(err);
-fprintf(stderr, "CUDA Error: %s (at %s)\n", e, label);
-}
+	// we need to synchronise first to catch errors due to
+	// asynchroneous operations that would otherwise
+	// potentially go unnoticed
+	cudaError_t err;
+	err = cudaThreadSynchronize();
+	if (err != cudaSuccess)
+	{
+		char *e = (char*) cudaGetErrorString(err);
+		fprintf(stderr, "CUDA Error: %s (at %s)\n", e, label);
+	}
+	err = cudaGetLastError();
+	if (err != cudaSuccess)
+	{
+		char *e = (char*) cudaGetErrorString(err);
+		fprintf(stderr, "CUDA Error: %s (at %s)\n", e, label);
+	}
 }
 
 double get_time()
-{  struct timeval tim;
-  cudaThreadSynchronize();
-  gettimeofday(&tim, NULL);
-  return (double) tim.tv_sec+(tim.tv_usec/1000000.0);
+{  
+	struct timeval tim;
+	cudaThreadSynchronize();
+	gettimeofday(&tim, NULL);
+	return (double) tim.tv_sec+(tim.tv_usec/1000000.0);
 }
 
 // GPU kernel
@@ -103,8 +104,10 @@ int main()
 
 	// Generate mesh and intial condition
 	for (int j=0; j<N; j++)
-	{	for (int i=0; i<N; i++)
-		{	I = N*j + i;
+	{	
+		for (int i=0; i<N; i++)
+		{	
+			I = N*j + i;
 			x[I] = xmin + h*i;
 			y[I] = ymin + h*j;
 			u[I] = 0.0f;
@@ -141,8 +144,10 @@ int main()
 
 	std::ofstream temperature("temperature_shared.txt");
 	for (int j=0; j<N; j++)
-	{	for (int i=0; i<N; i++)
-		{	I = N*j + i;
+	{	
+		for (int i=0; i<N; i++)
+		{	
+			I = N*j + i;
 		//	std::cout<<u[I]<<"\t";
 			temperature<<x[I]<<"\t"<<y[I]<<"\t"<<u[I]<<std::endl;
 		}
