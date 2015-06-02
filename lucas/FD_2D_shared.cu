@@ -1,32 +1,29 @@
 #include <iostream>
 #include <fstream>
 #include <cmath>
+#include <cstdlib>
 #include <sys/time.h>
 
 #define BSZ (16)
 
-void checkErrors(char *label)
-{
+void checkErrors(char *label) {
 	// we need to synchronise first to catch errors due to
 	// asynchroneous operations that would otherwise
 	// potentially go unnoticed
 	cudaError_t err;
 	err = cudaThreadSynchronize();
-	if (err != cudaSuccess)
-	{
+	if (err != cudaSuccess) {
 		char *e = (char*) cudaGetErrorString(err);
 		fprintf(stderr, "CUDA Error: %s (at %s)\n", e, label);
 	}
 	err = cudaGetLastError();
-	if (err != cudaSuccess)
-	{
+	if (err != cudaSuccess) {
 		char *e = (char*) cudaGetErrorString(err);
 		fprintf(stderr, "CUDA Error: %s (at %s)\n", e, label);
 	}
 }
 
-double get_time()
-{  
+double get_time() {  
 	struct timeval tim;
 	cudaThreadSynchronize();
 	gettimeofday(&tim, NULL);
@@ -34,24 +31,25 @@ double get_time()
 }
 
 // GPU kernel
-__global__ void copy_array(float *u, float *u_prev, int N)
-{
-        int i = threadIdx.x;
-        int j = threadIdx.y;
-        int I = blockIdx.y*BSZ*N + blockIdx.x*BSZ + j*N + i;
-        if (I>=N*N){return;}    
-        u_prev[I] = u[I];
-
+__global__ void copy_array(float *u, float *u_prev, int N) {
+    int i = threadIdx.x;
+    int j = threadIdx.y;
+    int I = blockIdx.y*BSZ*N + blockIdx.x*BSZ + j*N + i;
+    if (I>=N*N) {
+		return;
+	}   
+    u_prev[I] = u[I];
 }
 
-__global__ void update (float *u, float *u_prev, int N, float h, float dt, float alpha)
-{
+__global__ void update (float *u, float *u_prev, int N, float h, float dt, float alpha) {
 	// Setting up indices
 	int i = threadIdx.x;
 	int j = threadIdx.y;
 	int I = blockIdx.y*BSZ*N + blockIdx.x*BSZ + j*N + i;
 	
-	if (I>=N*N){return;}	
+	if (I>=N*N) {
+		return;
+	}	
 
 	__shared__ float u_prev_sh[BSZ][BSZ];
 
@@ -63,23 +61,27 @@ __global__ void update (float *u, float *u_prev, int N, float h, float dt, float
 	bool block_check = ((i>0) && (i<BSZ-1) && (j>0) && (j<BSZ-1));
 
 	// if not on block boundary do 
-	if (block_check)
-	{	u[I] = u_prev_sh[i][j] + alpha*dt/h/h * (u_prev_sh[i+1][j] + u_prev_sh[i-1][j] + u_prev_sh[i][j+1] + u_prev_sh[i][j-1] - 4*u_prev_sh[i][j]);
+	if (block_check) {	
+		u[I] = u_prev_sh[i][j] + alpha*dt/h/h * (u_prev_sh[i+1][j] + u_prev_sh[i-1][j] + u_prev_sh[i][j+1] + u_prev_sh[i][j-1] - 4*u_prev_sh[i][j]);
 	}
 	// if not on boundary 
-	else if (bound_check) 
+	else if (bound_check) {
 	//if (bound_check) 
-	{	u[I] = u_prev[I] + alpha*dt/(h*h) * (u_prev[I+1] + u_prev[I-1] + u_prev[I+N] + u_prev[I-N] - 4*u_prev[I]);
+		u[I] = u_prev[I] + alpha*dt/(h*h) * (u_prev[I+1] + u_prev[I-1] + u_prev[I+N] + u_prev[I-N] - 4*u_prev[I]);
 	}
 	
 	// Boundary conditions are automatically imposed
 	// as we don't touch boundaries
 }
 
-int main()
-{
+int main(int argc, char** argv) {
+	// TODO: ustalić argumenty wywołania
+	if(argc != 2) {
+		fprintf(stderr, "Wrong arguments. Usage: %s <N>\n", argv[0]);
+		return EXIT_FAILURE;
+	}
 	// Allocate in CPU
-	int N = 128;
+	int N = atoi(argv[1]);
 	int BLOCKSIZE = BSZ;
 
 	cudaSetDevice(2);
@@ -103,16 +105,15 @@ int main()
 
 
 	// Generate mesh and intial condition
-	for (int j=0; j<N; j++)
-	{	
-		for (int i=0; i<N; i++)
-		{	
+	for (int j=0; j<N; j++) {	
+		for (int i=0; i<N; i++) {	
 			I = N*j + i;
 			x[I] = xmin + h*i;
 			y[I] = ymin + h*j;
 			u[I] = 0.0f;
-			if ( (i==0) || (j==0)) 
-				{u[I] = 200.0f;}
+			if ( (i==0) || (j==0)) {
+				u[I] = 200.0f;
+			}
 		}
 	}
 
@@ -129,24 +130,23 @@ int main()
 	dim3 dimGrid(int((N-0.5)/BLOCKSIZE)+1, int((N-0.5)/BLOCKSIZE)+1);
 	dim3 dimBlock(BLOCKSIZE, BLOCKSIZE);
 	double start = get_time();
-	for (int t=0; t<steps; t++)
-	{	copy_array <<<dimGrid, dimBlock>>> (u_d, u_prev_d, N);
+	for (int t=0; t<steps; t++) {	
+		copy_array <<<dimGrid, dimBlock>>> (u_d, u_prev_d, N);
 		update <<<dimGrid, dimBlock>>> (u_d, u_prev_d, N, h, dt, alpha);
 	}
 	double stop = get_time();
 
 	checkErrors("update");
 	double elapsed = stop - start;
-        std::cout<<"time = "<<elapsed<<std::endl;
+    //	!!! Wydruk na konsolę: N time
+	std::cout << N << " " << elapsed << std::endl;
 	
 	// Copy result back to host
 	cudaMemcpy(u, u_d, N*N*sizeof(float), cudaMemcpyDeviceToHost);
 
-	std::ofstream temperature("temperature_shared.txt");
-	for (int j=0; j<N; j++)
-	{	
-		for (int i=0; i<N; i++)
-		{	
+	std::ofstream temperature("output/gpu_temperature_shared.txt");
+	for (int j=0; j<N; j++) {	
+		for (int i=0; i<N; i++) {	
 			I = N*j + i;
 		//	std::cout<<u[I]<<"\t";
 			temperature<<x[I]<<"\t"<<y[I]<<"\t"<<u[I]<<std::endl;

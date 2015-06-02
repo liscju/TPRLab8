@@ -2,6 +2,7 @@
 #include <iostream>
 #include <fstream>
 #include <cmath>
+#include <cstdlib>
 #include <sys/time.h>
 
 void checkErrors(char *label) {
@@ -32,7 +33,9 @@ __global__ void copy_array(float *u, float *u_prev, int N, int BSZ) {
 	int i = threadIdx.x;
 	int j = threadIdx.y;
 	int I = blockIdx.y*BSZ*N + blockIdx.x*BSZ + j*N + i;
-	if (I>=N*N){return;}	
+	if (I>=N*N){
+		return;
+	}	
 	u_prev[I] = u[I];
 }
 
@@ -58,9 +61,14 @@ __global__ void update (float *u, float *u_prev, int N, float h, float dt, float
 	// as we don't touch boundaries
 }
 
-int main() {
+int main(int argc, char** argv) {
+	// TODO: ustalić argumenty wywołania
+	if(argc != 2) {
+		fprintf(stderr, "Wrong arguments. Usage: %s <N>\n", argv[0]);
+		return EXIT_FAILURE;
+	}
 	// Allocate in CPU
-	int N = 128;
+	int N = atoi(argv[1]);
 	int BLOCKSIZE = 16;
 
 	cudaSetDevice(2);
@@ -117,12 +125,13 @@ int main() {
 	checkErrors("update");
 	
 	double elapsed = stop - start;
-	std::cout<<"time = "<<elapsed<<std::endl;
+	//	!!! Wydruk na konsolę: N time
+	std::cout << N << " " << elapsed << std::endl;
 
 	// Copy result back to host
 	cudaMemcpy(u, u_d, N*N*sizeof(float), cudaMemcpyDeviceToHost);
 
-	std::ofstream temperature("temperature_global.txt");
+	std::ofstream temperature("output/gpu_temperature_global.txt");
 	for (int j=0; j<N; j++) {
 		for (int i=0; i<N; i++) {	
 			I = N*j + i;

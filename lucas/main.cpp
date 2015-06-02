@@ -1,16 +1,17 @@
 #include <iostream>
 #include <cmath>
+#include <cstdlib>
 #include <fstream>
 #include <sys/time.h>
 
 
-void updateLaplace (float *u, float *u_prev, int N, float h, float dt, float alpha, int BSZ) {
+void updateLaplace (float *u, float *u_prev, int N, float h, float dt, float alpha) {
 	for(int i=1; i<N; ++i) {
 		for(int j=1; j<N; ++j) {
 			int I = j*N + i;
 
 			if (I >= N*N) {
-				std::cout << "DEBUG: I >= N*N" << std::endl;
+				//std::cout << "DEBUG: I >= N*N" << std::endl;
 				continue;
 			}	
 
@@ -30,9 +31,13 @@ double get_time() {
 	return (double) tim.tv_sec+(tim.tv_usec/1000000.0);
 }
 
-int main() {
-	int N = 128;
-	int blockSize = 16;
+int main(int argc, char** argv) {
+	if(argc != 2) {
+		fprintf(stderr, "Wrong arguments. Usage: %s <N>\n", argv[0]);
+		return EXIT_FAILURE;
+	}
+
+	int N = atoi(argv[1]);
 	
 	float xmin 	= 0.0f;
 	float xmax 	= 3.5f;
@@ -61,17 +66,18 @@ int main() {
 		}
 	}
 	double start = get_time();
-	std::cout << "DEBUG: Calling update function" << std::endl;
+	//std::cout << "DEBUG: Calling update function" << std::endl;
 	for (int t=0; t<steps; t++) {
-		updateLaplace(u, u_prev, N, h, dt, alpha, blockSize);
+		updateLaplace(u, u_prev, N, h, dt, alpha);
 	}	
-	std::cout << "DEBUG: Exit update function" << std::endl;
+	//std::cout << "DEBUG: Exit update function" << std::endl;
 	double stop = get_time();
 	double elapsed = stop - start;
-	std::cout << "time = " << elapsed << std::endl;
+	//	!!! Wydruk na konsolę: N time
+	std::cout << N << " " << elapsed << std::endl;
 
 	std::ofstream temperature;
-	temperature.open("output/cpu_results.txt");
+	temperature.open("output/cpu_temperature.txt");
 	temperature << "x[I]\ty[I]\tu[I]" << std::endl;
 	for (int j = 0; j < N; j++) {	
 		for (int i = 0; i < N; i++) {	
@@ -88,5 +94,5 @@ int main() {
 	delete[] u;
 	delete[] u_prev;
 	
-	return 0;
+	return EXIT_SUCCESS;
 }
