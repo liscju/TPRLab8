@@ -1,0 +1,29 @@
+﻿Build started 2015-06-07 20:45:47.
+     1>Project "F:\DRIVE\GIT\TPRLab8\henrar\VSProjects\TPRLab8\TPRLab8\TPRLab8.vcxproj" on node 2 (Build target(s)).
+     1>AddCudaCompileDeps:
+         C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\bin\x86_amd64\cl.exe /E /nologo /showIncludes /TP /D__CUDACC__ /DWIN32 /DWIN64 /DNDEBUG /D_CONSOLE /D_MBCS /I"C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v7.0\include" /I"C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v7.0\bin" /I"C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v7.0\include" /I. /FIcuda_runtime.h /c F:\DRIVE\GIT\TPRLab8\henrar\FD_2D_global.cu 
+       CudaBuild:
+         Compiling CUDA source file ..\..\..\FD_2D_global.cu...
+         cmd.exe /C "C:\Users\Henrar\AppData\Local\Temp\tmpace304f51f794a85bbb226214b9e5355.cmd"
+         "C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v7.0\bin\nvcc.exe" -gencode=arch=compute_20,code=\"sm_20,compute_20\" --use-local-env --cl-version 2013 -ccbin "C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\bin\x86_amd64"  -I"C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v7.0\include" -I"C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v7.0\include"     --keep-dir x64\Release -maxrregcount=0  --machine 64 --compile -cudart static     -DWIN32 -DWIN64 -DNDEBUG -D_CONSOLE -D_MBCS -Xcompiler "/EHsc /W3 /nologo /O2 /Zi  /MD  " -o x64\Release\FD_2D_global.cu.obj "F:\DRIVE\GIT\TPRLab8\henrar\FD_2D_global.cu"
+         
+         F:\DRIVE\GIT\TPRLab8\henrar\VSProjects\TPRLab8\TPRLab8>"C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v7.0\bin\nvcc.exe" -gencode=arch=compute_20,code=\"sm_20,compute_20\" --use-local-env --cl-version 2013 -ccbin "C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\bin\x86_amd64"  -I"C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v7.0\include" -I"C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v7.0\include"     --keep-dir x64\Release -maxrregcount=0  --machine 64 --compile -cudart static     -DWIN32 -DWIN64 -DNDEBUG -D_CONSOLE -D_MBCS -Xcompiler "/EHsc /W3 /nologo /O2 /Zi  /MD  " -o x64\Release\FD_2D_global.cu.obj "F:\DRIVE\GIT\TPRLab8\henrar\FD_2D_global.cu" 
+         FD_2D_global.cu
+     1>F:/DRIVE/GIT/TPRLab8/henrar/FD_2D_global.cu(104): warning C4244: 'initializing' : conversion from 'float' to 'int', possible loss of data
+       Link:
+         C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\bin\x86_amd64\link.exe /ERRORREPORT:PROMPT /OUT:"F:\DRIVE\GIT\TPRLab8\henrar\VSProjects\TPRLab8\x64\Release\TPRLab8Global.exe" /NOLOGO /LIBPATH:"C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v7.0\lib\x64" cudart.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /MANIFEST /MANIFESTUAC:"level='asInvoker' uiAccess='false'" /manifest:embed /DEBUG /PDB:"F:\DRIVE\GIT\TPRLab8\henrar\VSProjects\TPRLab8\x64\Release\TPRLab8Global.pdb" /SUBSYSTEM:CONSOLE /OPT:REF /OPT:ICF /LTCG /TLBID:1 /DYNAMICBASE /NXCOMPAT /IMPLIB:"F:\DRIVE\GIT\TPRLab8\henrar\VSProjects\TPRLab8\x64\Release\TPRLab8Global.lib" /MACHINE:X64 x64\Release\FD_2D_global.cu.obj
+         LINK : /LTCG specified but no code generation required; remove /LTCG from the link command line to improve linker performance
+         TPRLab8.vcxproj -> F:\DRIVE\GIT\TPRLab8\henrar\VSProjects\TPRLab8\x64\Release\TPRLab8Global.exe
+       PostBuildEvent:
+         echo copy "C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v7.0\bin\cudart*.dll" "F:\DRIVE\GIT\TPRLab8\henrar\VSProjects\TPRLab8\x64\Release\"
+         copy "C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v7.0\bin\cudart*.dll" "F:\DRIVE\GIT\TPRLab8\henrar\VSProjects\TPRLab8\x64\Release\"
+         :VCEnd
+         copy "C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v7.0\bin\cudart*.dll" "F:\DRIVE\GIT\TPRLab8\henrar\VSProjects\TPRLab8\x64\Release\"
+         C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v7.0\bin\cudart32_70.dll
+         C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v7.0\bin\cudart64_70.dll
+                 2 file(s) copied.
+     1>Done Building Project "F:\DRIVE\GIT\TPRLab8\henrar\VSProjects\TPRLab8\TPRLab8\TPRLab8.vcxproj" (Build target(s)).
+
+Build succeeded.
+
+Time Elapsed 00:00:09.83
