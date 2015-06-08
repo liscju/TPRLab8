@@ -6,6 +6,8 @@
 #include <winsock2.h>
 #include <cstdint>
 
+const int N_table[10] = { 32, 64, 128, 256, 512, 1024, 2048, 4096 };
+
 int gettimeofday(struct timeval * tp, struct timezone * tzp)
 {
 	static const uint64_t EPOCH = ((uint64_t)116444736000000000ULL);
@@ -80,90 +82,82 @@ __global__ void update (float *u, float *u_prev, int N, float h, float dt, float
 	// as we don't touch boundaries
 }
 
-int main(int argc, char** argv) {
-	// TODO: ustalić argumenty wywołania
-	if(argc != 2) {
-		fprintf(stderr, "Wrong arguments. Usage: %s <N>\n", argv[0]);
-		return EXIT_FAILURE;
-	}
-	// Allocate in CPU
-	int N = atoi(argv[1]);
-	int BLOCKSIZE = 16;
+int main(int argc, char** argv) 
+{
+	std::ofstream resultsFile("results/results_global.txt", std::ofstream::app);
 
-	cudaSetDevice(2);
+	for (int hurr = 0; hurr < 8; hurr++)
+	{
+		int N = N_table[hurr];
+		int BLOCKSIZE = 16;
 
-	float xmin 	= 0.0f;
-	float xmax 	= 3.5f;
-	float ymin 	= 0.0f;
-	//float ymax 	= 2.0f;
-	float h   	= (xmax-xmin)/(N-1);
-	float dt	= 0.00001f;	
-	float alpha	= 0.645f;
-	float time 	= 0.4f;
+		cudaSetDevice(2);
 
-	int steps = ceil(time/dt);
-	int I;
+		float xmin = 0.0f;
+		float xmax = 3.5f;
+		float ymin = 0.0f;
+		//float ymax 	= 2.0f;
+		float h = (xmax - xmin) / (N - 1);
+		float dt = 0.00001f;
+		float alpha = 0.645f;
+		float time = 0.4f;
 
-	float *x  	= new float[N*N]; 
-	float *y  	= new float[N*N]; 
-	float *u  	= new float[N*N];
-	float *u_prev  	= new float[N*N];
+		int steps = ceil(time / dt);
+		int I;
 
+		float *x = new float[N*N];
+		float *y = new float[N*N];
+		float *u = new float[N*N];
+		float *u_prev = new float[N*N];
 
-	// Generate mesh and intial condition
-	for (int j=0; j<N; j++) {	
-		for (int i=0; i<N; i++) {	
-			I = N*j + i;
-			x[I] = xmin + h*i;
-			y[I] = ymin + h*j;
-			u[I] = 0.0f;
-			if ( (i==0) || (j==0)) {
-				u[I] = 200.0f;
+		// Generate mesh and intial condition
+		for (int j = 0; j < N; j++) {
+			for (int i = 0; i < N; i++) {
+				I = N*j + i;
+				x[I] = xmin + h*i;
+				y[I] = ymin + h*j;
+				u[I] = 0.0f;
+				if ((i == 0) || (j == 0)) {
+					u[I] = 200.0f;
+				}
 			}
 		}
-	}
 
-	// Allocate in GPU
-	float *u_d, *u_prev_d;
-	
-	cudaMalloc( (void**) &u_d, N*N*sizeof(float));
-	cudaMalloc( (void**) &u_prev_d, N*N*sizeof(float));
+		// Allocate in GPU
+		float *u_d, *u_prev_d;
 
-	// Copy to GPU
-	cudaMemcpy(u_d, u, N*N*sizeof(float), cudaMemcpyHostToDevice);
+		cudaMalloc((void**)&u_d, N*N*sizeof(float));
+		cudaMalloc((void**)&u_prev_d, N*N*sizeof(float));
 
-	// Loop 
-	dim3 dimGrid(int((N-0.5)/BLOCKSIZE)+1, int((N-0.5)/BLOCKSIZE)+1);
-	dim3 dimBlock(BLOCKSIZE, BLOCKSIZE);
-	double start = get_time();
-	for (int t=0; t<steps; t++) {
-		copy_array <<<dimGrid, dimBlock>>> (u_d, u_prev_d, N, BLOCKSIZE);
-		update <<<dimGrid, dimBlock>>> (u_d, u_prev_d, N, h, dt, alpha, BLOCKSIZE);
-	}
-	double stop = get_time();
-	checkErrors("update");
-	
-	double elapsed = stop - start;
-	//	!!! Wydruk na konsolę: N time
-	std::cout << N << " " << elapsed << std::endl;
+		// Copy to GPU
+		cudaMemcpy(u_d, u, N*N*sizeof(float), cudaMemcpyHostToDevice);
 
-	// Copy result back to host
-	cudaMemcpy(u, u_d, N*N*sizeof(float), cudaMemcpyDeviceToHost);
-
-	std::ofstream temperature("output/gpu_temperature_global.txt");
-	for (int j=0; j<N; j++) {
-		for (int i=0; i<N; i++) {	
-			I = N*j + i;
-		//	std::cout<<u[I]<<"\t";
-			temperature<<x[I]<<"\t"<<y[I]<<"\t"<<u[I]<<std::endl;
+		// Loop 
+		dim3 dimGrid(int((N - 0.5) / BLOCKSIZE) + 1, int((N - 0.5) / BLOCKSIZE) + 1);
+		dim3 dimBlock(BLOCKSIZE, BLOCKSIZE);
+		double start = get_time();
+		for (int t = 0; t < steps; t++) {
+			copy_array << <dimGrid, dimBlock >> > (u_d, u_prev_d, N, BLOCKSIZE);
+			update << <dimGrid, dimBlock >> > (u_d, u_prev_d, N, h, dt, alpha, BLOCKSIZE);
 		}
-		temperature<<"\n";
-		//std::cout<<std::endl;
+		double stop = get_time();
+		checkErrors("update");
+
+		double elapsed = stop - start;
+		//	!!! Wydruk na konsolę: N time
+		resultsFile << N << "\t" << elapsed << std::endl;
+
+		// Copy result back to host
+		cudaMemcpy(u, u_d, N*N*sizeof(float), cudaMemcpyDeviceToHost);
+
+		// Free device
+		delete[] x;
+		delete[] y;
+		delete[] u;
+		delete[] u_prev;
+		cudaFree(u_d);
+		cudaFree(u_prev_d);
 	}
-
-	temperature.close();
-
-	// Free device
-	cudaFree(u_d);
-	cudaFree(u_prev_d);
+	resultsFile.close();
+	return 0;
 }

@@ -49,6 +49,7 @@ Global
 		{C5DA5090-8BCE-4C14-B337-560B592EFBEA}.Release|Win32.ActiveCfg = Release|Win32
 		{C5DA5090-8BCE-4C14-B337-560B592EFBEA}.Release|Win32.Build.0 = Release|Win32
 		{C5DA5090-8BCE-4C14-B337-560B592EFBEA}.Release|x64.ActiveCfg = Release|Win32
+		{C5DA5090-8BCE-4C14-B337-560B592EFBEA}.Release|x64.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -1,5 +1,5 @@
-﻿Build started 2015-06-07 20:44:37.
-     1>Project "F:\DRIVE\GIT\TPRLab8\henrar\VSProjects\TPRLab8\TPRLab8CPU\TPRLab8CPU.vcxproj" on node 2 (Build target(s)).
+﻿Build started 2015-06-08 13:34:19.
+     1>Project "F:\DRIVE\GIT\TPRLab8\henrar\VSProjects\TPRLab8\TPRLab8CPU\TPRLab8CPU.vcxproj" on node 2 (Rebuild target(s)).
      1>ClCompile:
          C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\bin\CL.exe /c /Zi /nologo /W3 /WX- /sdl /O2 /Oi /Oy- /GL /D WIN32 /D NDEBUG /D _CONSOLE /D _LIB /D _UNICODE /D UNICODE /Gm- /EHsc /MD /GS /Gy /fp:precise /Zc:wchar_t /Zc:forScope /Fo"Release\\" /Fd"Release\vc120.pdb" /Gd /TP /analyze- /errorReport:prompt ..\..\..\main.cpp
          main.cpp
@@ -8,8 +8,8 @@
          Generating code
          Finished generating code
          TPRLab8CPU.vcxproj -> F:\DRIVE\GIT\TPRLab8\henrar\VSProjects\TPRLab8\Release\TPRLab8CPU.exe
-     1>Done Building Project "F:\DRIVE\GIT\TPRLab8\henrar\VSProjects\TPRLab8\TPRLab8CPU\TPRLab8CPU.vcxproj" (Build target(s)).
+     1>Done Building Project "F:\DRIVE\GIT\TPRLab8\henrar\VSProjects\TPRLab8\TPRLab8CPU\TPRLab8CPU.vcxproj" (Rebuild target(s)).
 
 Build succeeded.
 
-Time Elapsed 00:00:01.93
+Time Elapsed 00:00:02.79
